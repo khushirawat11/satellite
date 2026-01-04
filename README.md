@@ -112,6 +112,135 @@ Beyond prediction accuracy, the project also focuses on **interpretability**, us
 4. Final predictions will be saved as:
    - `final_predictions.csv`
 
+---
+
+## Conceptual Overview
+
+House prices are influenced not only by the physical attributes of a house (such as size, number of rooms, or age), but also by the **surrounding neighborhood** — density, greenery, road access, and overall urban structure.
+
+Traditional machine learning models rely only on **tabular data**, which captures *what the house is*, but often misses *where the house is* and *what surrounds it*.
+
+This project addresses that gap using a **multimodal learning approach**.
+
+---
+
+### 1. Why Multimodal?
+
+We combine two complementary sources of information:
+
+- **Tabular data**  
+  Captures structured, well-known drivers of price:
+  - square footage  
+  - number of bedrooms and bathrooms  
+  - location coordinates  
+  - construction year, grade, condition  
+
+- **Satellite imagery (Sentinel-2)**  
+  Captures visual context:
+  - neighborhood density  
+  - greenery vs concrete  
+  - road networks  
+  - proximity to water or open land  
+
+Each modality answers a different question:
+- Tabular data → *What is the house?*
+- Satellite images → *What does the surrounding area look like?*
+
+---
+
+### 2. How Images Become Numbers
+
+Raw images cannot be directly used by classical ML models.
+
+To solve this:
+- A **pretrained ResNet18** CNN is used as a feature extractor
+- Each satellite image is converted into a **512-dimensional embedding**
+- These embeddings summarize visual patterns such as:
+  - texture
+  - density
+  - spatial layout
+
+The CNN is **not trained from scratch** — it transfers learned visual knowledge from ImageNet to satellite imagery.
+
+---
+
+### 3. Why Log Price Transformation?
+
+House prices are highly skewed:
+- Most houses are mid-priced
+- A few very expensive houses dominate the scale
+
+We apply a **log transformation** to prices to:
+- reduce the impact of extreme outliers
+- stabilize training
+- allow the model to focus on *relative differences* rather than absolute price gaps
+
+Predictions are converted back to the original price scale for evaluation.
+
+---
+
+### 4. Fusion Strategy
+
+Instead of forcing a single deep network:
+- Tabular features are scaled and cleaned
+- Image embeddings are concatenated with tabular features
+- A **tree-based model (XGBoost)** learns interactions between:
+  - structured numeric features
+  - visual neighborhood signals
+
+This keeps the system:
+- flexible
+- interpretable
+- robust on limited data
+
+---
+
+### 5. Why Explainability Matters
+
+Accuracy alone is not sufficient.
+
+We use **Grad-CAM** on an image-only model to verify:
+- whether the model focuses on **economically meaningful regions**
+- not on random noise or image borders
+
+By comparing:
+- high-priced houses
+- low-priced houses
+
+we check whether attention maps highlight:
+- dense urban zones
+- greenery
+- road connectivity
+- open vs congested spaces
+
+Models whose attention appears random are rejected.
+
+---
+
+### 6. Key Insight
+
+In this dataset:
+- **Tabular features remain the strongest predictors**
+- Satellite imagery adds **context**, not dominance
+- Visual signals are more useful for:
+  - validating model behavior
+  - understanding neighborhood effects
+  - supporting economic intuition
+
+This confirms an important lesson:
+> Multimodal learning improves *understanding* even when it does not dramatically improve *metrics*.
+
+---
+
+### 7. Final Takeaway
+
+This project demonstrates how:
+- multimodal ML can bridge structured data and spatial context
+- explainability tools can validate economic reasoning
+- careful modeling choices often matter more than architectural complexity
+
+The result is a model that is not only predictive, but **trustworthy and interpretable**.
+
 
    
    
