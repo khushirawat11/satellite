@@ -73,118 +73,82 @@ Beyond prediction accuracy, the project also focuses on **interpretability**, us
   - Grad-CAM confirms the model focuses on **neighborhood structure**, not random noise
 
 ---
-## Data Requirements and Setup
 
-### Environment Setup
-Python ≥ 3.9 recommended.
+## 3. Data Requirements and Setup
+
+1. **Create a virtual environment** (recommended, Python ≥ 3.9):
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
+```
+2. **Install dependencies**:
+
+```bash
+pip install -r requirements.txt
+```
+3. **Place the King County dataset**:
+
+- Download the King County housing CSV (commonly named `kc_house_data.csv`) and save it to:
+  - `data/raw/kc_house_data.csv`
+
+4. **Configure Sentinel Hub credentials**:
+
+- Create a `.env` file in the project root or set environment variables (recommended):
+  - `SENTINELHUB_CLIENT_ID`
+  - `SENTINELHUB_CLIENT_SECRET`
+  - Optionally, additional config such as:
+    - `SENTINELHUB_INSTANCE_ID` (for older setups)
+    - Default collection / resolution if needed.
+
+The `data_fetcher.py` module will read these environment variables and handle authentication.
 
 ---
+## 4. Sentinel Hub Image Fetching (Engineering Considerations)
 
-## How to Run
+### Why Resolution and Tile Size Matter Economically
 
-1. Install dependencies  
-   ```bash
-   pip install -r requirements.txt
+**Zoom / Ground Sampling Distance (GSD):**
 
-2. Download satellite images 
+- Too coarse (60–100 m/pixel): individual properties blur together and neighborhood structure is lost.
+- Too fine (sub-meter): redundant details, heavy downloads, and higher risk of overfitting.
+- This project uses a **parcel-scale context window** (≈10 m/pixel, ~224×224 px) to capture:
+  - Greenery and tree canopy
+  - Road layout and accessibility
+  - Proximity to water bodies
+  - Density of surrounding buildings
+
+**Bounding Box Size:**
+
+- Buyers value **nearby context**, not just the parcel itself.
+- A fixed-radius bounding box (≈250–500 m) centered on each property encodes **neighborhood quality**, including amenities and disamenities.
+
+**Determinism & Reproducibility:**
+
+- Image filenames are deterministic functions of the property `id`.
+- Metadata linking each `id` to its image path is stored in:
+  ```text
+  data/satellite/image_metadata.csv
+**Robustness engineering**:
+
+- Automatic **retry logic** with exponential backoff for transient Sentinel Hub errors.
+- Graceful handling of:
+  - Missing tiles or cloud cover (configurable filters).
+  - API rate limits (throttling and logging).
+  - Partial coverage (e.g., edges of acquisition area).
+
+Details are implemented in `data_fetcher.py`.
+
+---
+### 5. Workflow
+
+1. **Fetch Satellite Images**
+   
+   Run the Sentinel Hub image downloader:
    ```bash
    python data_fetcher.py
-   
-3. Run notebooks in order:      
-  - `preprocessing.ipynb`
-  - `model_training1.ipynb`
-  - `explainability.ipynb`
+   This step:
 
-4. Final predictions will be saved as:
-   - `final_predictions.csv`
-
----
-
-## Conceptual Overview
-
-House prices are influenced not only by the physical attributes of a house (such as size, number of rooms, or age), but also by the **surrounding neighborhood** — density, greenery, road access, and overall urban structure.
-
-Traditional machine learning models rely only on **tabular data**, which captures *what the house is*, but often misses *where the house is* and *what surrounds it*.
-
-This project addresses that gap using a **multimodal learning approach**.
-
----
-
-### 1. Why Multimodal?
-
-We combine two complementary sources of information:
-
-- **Tabular data**  
-  Captures structured, well-known drivers of price:
-  - square footage  
-  - number of bedrooms and bathrooms  
-  - location coordinates  
-  - construction year, grade, condition  
-
-- **Satellite imagery (Sentinel-2)**  
-  Captures visual context:
-  - neighborhood density  
-  - greenery vs concrete  
-  - road networks  
-  - proximity to water or open land  
-
-Each modality answers a different question:
-- Tabular data → *What is the house?*
-- Satellite images → *What does the surrounding area look like?*
-
----
-
-### 2. How Images Become Numbers
-
-Raw images cannot be directly used by classical ML models.
-
-To solve this:
-- A **pretrained ResNet18** CNN is used as a feature extractor
-- Each satellite image is converted into a **512-dimensional embedding**
-- These embeddings summarize visual patterns such as:
-  - texture
-  - density
-  - spatial layout
-
-The CNN is **not trained from scratch** — it transfers learned visual knowledge from ImageNet to satellite imagery.
-
----
-
-### 3. Why Log Price Transformation?
-
-House prices are highly skewed:
-- Most houses are mid-priced
-- A few very expensive houses dominate the scale
-
-We apply a **log transformation** to prices to:
-- reduce the impact of extreme outliers
-- stabilize training
-- allow the model to focus on *relative differences* rather than absolute price gaps
-
-Predictions are converted back to the original price scale for evaluation.
-
----
-
-### 4. Fusion Strategy
-
-Instead of forcing a single deep network:
-- Tabular features are scaled and cleaned
-- Image embeddings are concatenated with tabular features
-- A **tree-based model (XGBoost)** learns interactions between:
-  - structured numeric features
-  - visual neighborhood signals
-
-This keeps the system:
-- flexible
-- interpretable
-- robust on limited data
-
----
-
-
-   
-   
+*   Downloads Sentinel-2 satellite images using latitude/longitude
+*   Saves images to `data/images/`
+*   Creates `data/satellite/image_metadata.csv` mapping `id → image_path````
