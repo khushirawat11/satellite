@@ -156,7 +156,7 @@ Details are implemented in `data_fetcher.py`.
 
 2.  **Preprocessing & Exploratory Data Analysis**
 
-   Open `preprocessing.ipynb`:
+*   Open `preprocessing.ipynb`
 *   Cleans tabular housing data
 *   Handles missing values and outliers
 *   Applies **log price normalization**
@@ -170,10 +170,10 @@ Details are implemented in `data_fetcher.py`.
 
 3. ***Model Training (Tabular + Image + Fusion)***
 
+*   Open `model_training1.ipynb`
 *   Loads processed tabular data
 *   Extracts **ResNet-18 CNN embeddings** from satellite images
 *   Saves embeddings to:
-    
     *   `data/embeddings/resnet18_train_embeddings.csv`
     *   `data/embeddings/resnet18_val_embeddings.csv`
 *   Trains:
@@ -183,26 +183,31 @@ Details are implemented in `data_fetcher.py`.
 *   Evaluates using:
     *   RMSE
     *   R²
-*   Selects the best-performing mode
-
-4. Open `notebooks/explainability.ipynb`:
-   - Run Grad-CAM (or similar) on the image model.
-   - Inspect where the model focuses for **high vs. low priced** houses.
-   - Reject models whose attention is spatially random or economically uninterpretable.
-  
-5. **Generate test predictions**
-   *   Ensure test data exists at:
-       `data/processed/test2(test(1)).csv`
-   *   Run:
-       `model_training1.ipynb`
-   *   Loads test data
-   *   Matches available satellite images
-   *   Extracts CNN embeddings
-   *   Applies the trained fusion model
-   *   Generates predictions for **all test rows**
-   *   Saves output to:
+*   Generates final test predictions
+*   Saves output to:
          `final_predictions.csv`
-   *   Format:
+*   Format:
          `id, predicted_price`
+    
+4. ***Explainability & Model Interpretation***
+*   Trains a lightweight image-only regression model
+*   Applies **Grad-CAM** on the last ResNet convolution layer
+*   Visualizes spatial attention for:
+    *   High-priced houses
+    *   Low-priced houses
+*   Checks whether the model focuses on economically meaningful regions such as:
+    *   Greenery
+    *   Roads
+    *   Water bodies
+    *   Neighborhood density
+        
+
+6. **Final Outputs**
+*   `final_predictions.csv` → model predictions on test data
+*   Cached CNN embeddings for reproducibility
+*   Grad-CAM visualizations for interpretability
+*   Clear comparison of:
+    *   Tabular vs image vs fusion models
+   
 
    
