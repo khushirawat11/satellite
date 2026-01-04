@@ -211,34 +211,29 @@ Details are implemented in `data_fetcher.py`.
   
 5. **Generate test predictions**
    *   Ensure test data exists at:
-    
-*   `data/processed/test2(test(1)).csv`
-    
-
-*   Run:
-
-*   `python predict_test_prices.py`
+       `data/processed/test2(test(1)).csv`
     
 
-*   This step:
-
-*   Loads test data
-    
-*   Matches available satellite images
-    
-*   Extracts CNN embeddings
-    
-*   Applies the trained fusion model
-    
-*   Generates predictions for **all test rows**
-    
-*   Saves output to:
-    
-    `final_predictions.csv`
+   *   Run:
+       `python predict_test_prices.py`
     
 
-*   Format:
+    *   Loads test data
+    
+    *   Matches available satellite images
+    
+    *   Extracts CNN embeddings
+    
+    *   Applies the trained fusion model
+    
+    *   Generates predictions for **all test rows**
+    
+    *   Saves output to:
+    
+         `final_predictions.csv`
+    
+    *   Format:
 
-*   `id, predicted_price`
+         `id, predicted_price`
 
    
