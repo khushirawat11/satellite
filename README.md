@@ -210,4 +210,7 @@ Details are implemented in `data_fetcher.py`.
     *   Tabular vs image vs fusion models
    
 
-   
+
+**Submitted by:**
+* Khushi Rawat
+* 23113082
