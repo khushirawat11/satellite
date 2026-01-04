@@ -105,12 +105,12 @@ Beyond prediction accuracy, the project also focuses on **interpretability**, us
    python data_fetcher.py
    
 3. Run notebooks in order:      
-  - preprocessing.ipynb
-  - model_training1.ipynb
-  - explainability.ipynb
+  - `preprocessing.ipynb`
+  - `model_training1.ipynb`
+  - `explainability.ipynb`
 
 4. Final predictions will be saved as:
-   -final_predictions.csv
+   - `final_predictions.csv`
 
 
    
