@@ -1,4 +1,4 @@
-**Satellite Imagery-Based Property Valuation **
+**Satellite Imagery-Based Property Valuation**
 This project predicts house prices using a **multimodal approach**, combining:
 - **Tabular features** (size, rooms, location, etc.)
 - **Satellite images** (neighborhood context from Sentinel-2)
