@@ -9,40 +9,20 @@ Beyond prediction accuracy, the project also focuses on **interpretability**, us
 
 ---
 
-## Project Structure
+## Repository Structure
 
-- `data_fetcher.py` – Sentinel Hub image fetching pipeline  
-  *(latitude/longitude → bounding box → satellite tile saved locally + metadata).*
+- `data_fetcher.py` – Sentinel Hub image fetching pipeline (lat/long → image tiles + metadata)
+- `preprocessing.ipynb` – Data cleaning, log transformation, EDA, and train/validation splits
+- `model_training1.ipynb` – Tabular models, CNN feature extraction, multimodal fusion, evaluation
+- `explainability.ipynb` – Grad-CAM visualizations and economic interpretation
+- `final_predictions.csv` – Final test predictions
 
-- `preprocessing.ipynb` –  
-  Data cleaning, feature engineering, log-price normalization, and creation of train/validation splits.
-
-- `model_training1.ipynb` –  
-  Tabular model training, ResNet18 image embedding extraction, multimodal (tabular + image) fusion using XGBoost, evaluation, and test prediction generation.
-
-- `explainability.ipynb` –  
-  Model interpretability using **Grad-CAM** to visualize which regions of satellite images influence high and low house price predictions.
-
-- `final_predictions.csv` –  
-  Final submission-ready CSV containing predicted house prices for the test dataset.
-
----
-
-## Data Directory
-
-- `data/`
-  - `data/images/` – Downloaded satellite image tiles (`.png`)
-  - `data/satellite/image_metadata.csv` – Mapping between house `id` and satellite image paths with download status
-  - `data/processed/` – Cleaned and processed datasets:
-    - `train_final.csv`
-    - `val_final.csv`
-    - `test2(test(1)).csv`
-  - `data/embeddings/` – Cached CNN embeddings:
-    - `resnet18_train_embeddings.csv`
-    - `resnet18_val_embeddings.csv`
-    - `resnet18_test_embeddings.csv`
-
-- `train(1)(train(1)).csv` – Original raw housing dataset (user-provided)
+### Data Directories
+- `data/raw/` – Raw housing dataset (user provided)
+- `data/processed/` – Cleaned train/val/test CSVs
+- `data/images/` – Downloaded satellite image tiles
+- `data/satellite/` – Image metadata (ID → image path)
+- `data/embeddings/` – Cached ResNet image embeddings
 
 ---
 
@@ -91,6 +71,16 @@ Beyond prediction accuracy, the project also focuses on **interpretability**, us
   - Tabular features remain the strongest predictors
   - Satellite images add **contextual signals**, but benefits depend on image quality and coverage
   - Grad-CAM confirms the model focuses on **neighborhood structure**, not random noise
+
+---
+## Data Requirements and Setup
+
+### Environment Setup
+Python ≥ 3.9 recommended.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
 
 ---
 
@@ -194,52 +184,6 @@ This keeps the system:
 - robust on limited data
 
 ---
-
-### 5. Why Explainability Matters
-
-Accuracy alone is not sufficient.
-
-We use **Grad-CAM** on an image-only model to verify:
-- whether the model focuses on **economically meaningful regions**
-- not on random noise or image borders
-
-By comparing:
-- high-priced houses
-- low-priced houses
-
-we check whether attention maps highlight:
-- dense urban zones
-- greenery
-- road connectivity
-- open vs congested spaces
-
-Models whose attention appears random are rejected.
-
----
-
-### 6. Key Insight
-
-In this dataset:
-- **Tabular features remain the strongest predictors**
-- Satellite imagery adds **context**, not dominance
-- Visual signals are more useful for:
-  - validating model behavior
-  - understanding neighborhood effects
-  - supporting economic intuition
-
-This confirms an important lesson:
-> Multimodal learning improves *understanding* even when it does not dramatically improve *metrics*.
-
----
-
-### 7. Final Takeaway
-
-This project demonstrates how:
-- multimodal ML can bridge structured data and spatial context
-- explainability tools can validate economic reasoning
-- careful modeling choices often matter more than architectural complexity
-
-The result is a model that is not only predictive, but **trustworthy and interpretable**.
 
 
    
