@@ -148,7 +148,62 @@ Details are implemented in `data_fetcher.py`.
    ```bash
    python data_fetcher.py
    This step:
-
+   ```
+   
 *   Downloads Sentinel-2 satellite images using latitude/longitude
 *   Saves images to `data/images/`
-*   Creates `data/satellite/image_metadata.csv` mapping `id → image_path````
+*   Creates `data/satellite/image_metadata.csv` mapping `id → image_path`
+
+2.  **Preprocessing & Exploratory Data Analysis**
+
+   Open `preprocessing.ipynb`:
+   *   Cleans tabular housing data
+*   Handles missing values and outliers
+    
+*   Applies **log price normalization**
+    
+*   Performs tabular EDA (distributions, correlations)
+    
+*   Performs geospatial EDA (price vs latitude/longitude)
+    
+*   Creates leakage-aware train/validation splits
+    
+*   Outputs:
+    
+
+*   `data/processed/train_final.csv`
+    
+*   `data/processed/val_final.csv`
+    
+*   `data/processed/test2(test(1)).csv`
+
+3. ***Model Training (Tabular + Image + Fusion)***
+
+   *   Loads processed tabular data
+
+*   Extracts **ResNet-18 CNN embeddings** from satellite images
+    
+*   Saves embeddings to:
+    
+    *   `data/embeddings/resnet18_train_embeddings.csv`
+        
+    *   `data/embeddings/resnet18_val_embeddings.csv`
+        
+*   Trains:
+    
+    *   Tabular-only models
+        
+    *   Image-only models
+        
+    *   **Multimodal fusion model (XGBoost)**
+        
+*   Evaluates using:
+    
+    *   RMSE
+        
+    *   R²
+        
+
+*   Selects the best-performing mode
+
+   
