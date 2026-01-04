@@ -169,13 +169,11 @@ Details are implemented in `data_fetcher.py`.
 *   Creates leakage-aware train/validation splits
     
 *   Outputs:
+    *   `data/processed/train_final.csv`
     
-
-*   `data/processed/train_final.csv`
+    *   `data/processed/val_final.csv`
     
-*   `data/processed/val_final.csv`
-    
-*   `data/processed/test2(test(1)).csv`
+    *   `data/processed/test2(test(1)).csv`
 
 3. ***Model Training (Tabular + Image + Fusion)***
 
@@ -205,5 +203,42 @@ Details are implemented in `data_fetcher.py`.
         
 
 *   Selects the best-performing mode
+
+4. Open `notebooks/explainability.ipynb`:
+   - Run Grad-CAM (or similar) on the image model.
+   - Inspect where the model focuses for **high vs. low priced** houses.
+   - Reject models whose attention is spatially random or economically uninterpretable.
+  
+5. **Generate test predictions**
+   *   Ensure test data exists at:
+    
+*   `data/processed/test2(test(1)).csv`
+    
+
+*   Run:
+
+*   `python predict_test_prices.py`
+    
+
+*   This step:
+
+*   Loads test data
+    
+*   Matches available satellite images
+    
+*   Extracts CNN embeddings
+    
+*   Applies the trained fusion model
+    
+*   Generates predictions for **all test rows**
+    
+*   Saves output to:
+    
+    `final_predictions.csv`
+    
+
+*   Format:
+
+*   `id, predicted_price`
 
    
